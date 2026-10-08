@@ -21,3 +21,7 @@ management:
     web:
       exposure:
         include: health, info, prometheus, metrics # 메트릭은 항상 노출
+
+gilmok:
+  admission:
+    jwks-uri: ${GILMOK_ADMISSION_JWKS_URI:http://localhost:8082/gilmok-platform/.well-known/jwks.json}

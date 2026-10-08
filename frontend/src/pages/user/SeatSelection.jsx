@@ -8,6 +8,13 @@ export default function SeatSelection() {
   const navigate = useNavigate()
   const location = useLocation()
   const queueKey = location.state?.queueKey || localStorage.getItem(`queueKey_${eventId}`)
+  const admissionToken = location.state?.token || localStorage.getItem(`admissionToken_${eventId}`)
+
+  useEffect(() => {
+    if (location.state?.token) {
+      localStorage.setItem(`admissionToken_${eventId}`, location.state.token)
+    }
+  }, [eventId, location.state?.token])
 
   const [seats, setSeats] = useState([])
   const [selectedSeat, setSelectedSeat] = useState(null)
@@ -33,6 +40,10 @@ export default function SeatSelection() {
       seatId: selectedSeat.seatId,
       quantity,
       queueKey,
+    }, {
+      headers: {
+        'X-Admission-Token': admissionToken ? `Bearer ${admissionToken}` : '',
+      },
     })
       .then((d) => {
         navigate(`/events/${eventId}/reserve/confirm`, {
