@@ -1,13 +1,13 @@
-package kr.gilmok.auth.auth.service;
+package kr.gilmok.demo.auth.service;
 
-import kr.gilmok.auth.auth.dto.AuthTokenDto;
-import kr.gilmok.auth.auth.entity.AuthSession;
-import kr.gilmok.auth.auth.entity.User;
-import kr.gilmok.auth.auth.exception.AuthErrorCode;
-import kr.gilmok.auth.auth.repository.AuthSessionRepository;
-import kr.gilmok.auth.global.jwt.TokenProvider;
-import kr.gilmok.auth.global.util.TokenHashEncoder;
-import kr.gilmok.auth.global.exception.CustomException;
+import kr.gilmok.demo.auth.dto.AuthTokenDto;
+import kr.gilmok.demo.auth.entity.AuthSession;
+import kr.gilmok.demo.auth.entity.User;
+import kr.gilmok.demo.auth.exception.AuthErrorCode;
+import kr.gilmok.demo.auth.repository.AuthSessionRepository;
+import kr.gilmok.demo.global.jwt.TokenProvider;
+import kr.gilmok.demo.global.util.TokenHashEncoder;
+import kr.gilmok.demo.global.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

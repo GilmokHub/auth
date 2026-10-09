@@ -1,6 +1,6 @@
-package kr.gilmok.auth.auth.service;
+package kr.gilmok.demo.auth.service;
 
-import kr.gilmok.auth.auth.dto.SignupRequest;
+import kr.gilmok.demo.auth.dto.SignupRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: auth-service-test
+    name: demo-backend-test
 
   # 1. 테스트용 메모리 DB 설정 (MySQL 모드)
   datasource:
@@ -24,10 +24,6 @@ spring:
     redis:
       repositories:
         enabled: false # Redis Repository 기능 비활성화
-  rabbitmq:
-    listener:
-      type: simple
-      auto-startup: false # RabbitMQ 자동 시작 방지
 
   # 4. 보안 설정 (필요시 테스트 프로필 분리)
   security:
@@ -41,11 +37,9 @@ server:
 
 logging:
   level:
-    kr.gilmok.auth: DEBUG
+    kr.gilmok.demo: DEBUG
 
 app:
-  cors:
-    allowed-origins: "http://localhost:3000"
   jwt:
     secret: this-is-a-very-long-and-secure-secret-key-for-test-12345
     access-expiration-ms: 1800000   # 30분

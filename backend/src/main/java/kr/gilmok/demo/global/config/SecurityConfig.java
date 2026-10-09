@@ -1,10 +1,9 @@
 package kr.gilmok.demo.global.config;
 
-import jakarta.servlet.Filter;
 import kr.gilmok.demo.global.security.AccessTokenBlocklistFilter;
-import kr.gilmok.demo.global.security.CommonSecurityConfig;
 import kr.gilmok.demo.global.security.CustomAuthenticationEntryPoint;
 import kr.gilmok.demo.global.security.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,46 +12,73 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends CommonSecurityConfig {
+@RequiredArgsConstructor
+public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final AccessTokenBlocklistFilter accessTokenBlocklistFilter;
 
     @Value("${app.swagger.enabled:false}")
     private boolean swaggerEnabled;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
-                          AccessTokenBlocklistFilter accessTokenBlocklistFilter) {
-        super(jwtAuthenticationFilter, customAuthenticationEntryPoint);
-        this.accessTokenBlocklistFilter = accessTokenBlocklistFilter;
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName(null);
+
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint))
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    auth.requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll();
+                    if (swaggerEnabled) {
+                        auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    }
+                    auth
+                            .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/actuator/prometheus", "/actuator/health").permitAll()
+                            .requestMatchers("/error").permitAll();
+                    auth.anyRequest().authenticated();
+                })
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(accessTokenBlocklistFilter, JwtAuthenticationFilter.class);
+
+        return http.build();
     }
 
-    @Override
-    protected void configureRequestMatchers(
-            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
-        auth.requestMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll();
-        if (swaggerEnabled) {
-            auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll();
-        }
-        auth
-                .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue").permitAll()
-                .requestMatchers(HttpMethod.GET, "/actuator/prometheus", "/actuator/health").permitAll()
-                .requestMatchers("/error").permitAll();  // 404 등 에러 응답 시 forward되는 경로
-    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:3030", "http://127.0.0.1:3030"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
-    // JwtAuthenticationFilter 이후에 블랙리스트 체크 필터를 등록
-    // 로그아웃된 access token의 jti를 Redis에서 확인하여 차단
-    @Override
-    protected List<Filter> getFiltersAfterJwtAuthentication() {
-        return List.of(accessTokenBlocklistFilter);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean

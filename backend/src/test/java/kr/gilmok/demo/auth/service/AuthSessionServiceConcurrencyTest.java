@@ -1,9 +1,9 @@
-package kr.gilmok.auth.auth.service;
+package kr.gilmok.demo.auth.service;
 
-import kr.gilmok.auth.auth.entity.AuthSession;
-import kr.gilmok.auth.auth.entity.User;
-import kr.gilmok.auth.auth.repository.AuthSessionRepository;
-import kr.gilmok.auth.auth.repository.UserRepository;
+import kr.gilmok.demo.auth.entity.AuthSession;
+import kr.gilmok.demo.auth.entity.User;
+import kr.gilmok.demo.auth.repository.AuthSessionRepository;
+import kr.gilmok.demo.auth.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

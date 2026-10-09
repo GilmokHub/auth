@@ -1,16 +1,16 @@
-package kr.gilmok.auth.auth.service;
+package kr.gilmok.demo.auth.service;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import kr.gilmok.auth.auth.dto.AuthTokenDto;
-import kr.gilmok.auth.auth.dto.LoginRequest;
-import kr.gilmok.auth.auth.entity.User;
-import kr.gilmok.auth.auth.exception.AuthErrorCode;
-import kr.gilmok.auth.auth.repository.UserRepository;
-import kr.gilmok.auth.global.jwt.TokenProvider;
-import kr.gilmok.auth.global.dto.AuthUserDto;
-import kr.gilmok.auth.global.exception.CustomException;
-import kr.gilmok.auth.global.security.CustomUserDetails;
+import kr.gilmok.demo.auth.dto.AuthTokenDto;
+import kr.gilmok.demo.auth.dto.LoginRequest;
+import kr.gilmok.demo.auth.entity.User;
+import kr.gilmok.demo.auth.exception.AuthErrorCode;
+import kr.gilmok.demo.auth.repository.UserRepository;
+import kr.gilmok.demo.global.jwt.TokenProvider;
+import kr.gilmok.demo.global.dto.AuthUserDto;
+import kr.gilmok.demo.global.exception.CustomException;
+import kr.gilmok.demo.global.security.CustomUserDetails;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

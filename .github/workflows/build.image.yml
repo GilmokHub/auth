@@ -21,8 +21,7 @@ permissions:
   packages: write
 
 env:
-  # 이미지를 올릴 경로: ghcr.io/github아이디/레포이름 (모두 소문자여야 함!)
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/auth-repo
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/demo-backend
 
 jobs:
   build-and-push:
@@ -31,8 +30,6 @@ jobs:
       # 1. 소스 가져오기
       - name: Checkout Source
         uses: actions/checkout@v4
-        with:
-          submodules: true
 
       # 2. JDK 설정 + 캐싱
       - name: Set up JDK 17
@@ -48,7 +45,7 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      # 4. GHCR 로그인 (별도 Secret 필요 없음! 자동 토큰 사용)
+      # 4. GHCR 로그인
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -56,16 +53,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 5. 이미지 빌드 & 푸시
-      # 태그: ghcr.io/내아이디/프로젝트명:latest
+      # 5. 백엔드 이미지 빌드 & 푸시
       - name: Build and Push
         id: build_push
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true
           tags: ${{ env.IMAGE_NAME }}:latest
 
+      # 6. 배포 타깃 설정
       - name: Set Deploy Target
         id: set-target
         run: |
@@ -75,11 +73,12 @@ jobs:
             echo "DEPLOY_TARGET=oci" >> $GITHUB_ENV
           fi
 
+      # 7. 배포 레포지토리 트리거
       - name: Trigger Deploy Repo
         if: ${{ !cancelled() && steps.build_push.outcome == 'success' }}
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITOPS_TOKEN }}
-          repository: final-project-gilmok/deploy-repo
+          repository: GilmokHub/deploy
           event-type: update-image
-          client-payload: '{"image_tag": "latest", "image_url": "${{ env.IMAGE_NAME }}", "service_name": "auth-server", "target": "${{ env.DEPLOY_TARGET }}"}'
+          client-payload: '{"image_tag": "latest", "image_url": "${{ env.IMAGE_NAME }}", "service_name": "demo-backend", "target": "${{ env.DEPLOY_TARGET }}"}'

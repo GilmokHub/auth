@@ -1,14 +1,14 @@
-package kr.gilmok.auth.auth.service;
+package kr.gilmok.demo.auth.service;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import kr.gilmok.auth.auth.entity.AuthSession;
-import kr.gilmok.auth.auth.entity.User;
-import kr.gilmok.auth.auth.repository.AuthSessionRepository;
-import kr.gilmok.auth.global.jwt.JwtProvider;
-import kr.gilmok.auth.global.jwt.TokenProvider;
-import kr.gilmok.auth.global.util.TokenHashEncoder;
-import kr.gilmok.auth.global.security.AccessTokenBlocklistRepository;
+import kr.gilmok.demo.auth.entity.AuthSession;
+import kr.gilmok.demo.auth.entity.User;
+import kr.gilmok.demo.auth.repository.AuthSessionRepository;
+import kr.gilmok.demo.global.jwt.JwtProvider;
+import kr.gilmok.demo.global.jwt.TokenProvider;
+import kr.gilmok.demo.global.util.TokenHashEncoder;
+import kr.gilmok.demo.global.security.AccessTokenBlocklistRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

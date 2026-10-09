@@ -1,4 +1,4 @@
-package kr.gilmok.auth.auth.entity;
+package kr.gilmok.demo.auth.entity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

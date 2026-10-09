@@ -8,7 +8,3 @@ export function getDashboard() {
   return api.get('/users/me/dashboard')
 }
 
-export function getMyEvents() {
-  return api.get('/users/me/events')
-}
-
