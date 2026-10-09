@@ -19,3 +19,12 @@ export function openEvent(eventId) {
 export function closeEvent(eventId) {
   return api.post(`/admin/events/${eventId}/close`, {})
 }
+
+// 사용자 예매용 API
+export function getOpenEvents() {
+  return api.get('/events')
+}
+
+export function getEventSeats(eventId) {
+  return api.get(`/events/${eventId}/seats`)
+}

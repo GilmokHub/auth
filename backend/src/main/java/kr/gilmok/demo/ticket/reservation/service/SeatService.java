@@ -79,18 +79,4 @@ public class SeatService {
             seatLockRedisRepository.initAvailable(eventId, seat.getId(), seat.getAvailableCount());
         }
     }
-
-    public List<SeatStatsResponse> getSeatStats(Long eventId) {
-        List<Seat> seats = seatRepository.findByEventId(eventId);
-        return seats.stream()
-                .map(seat -> new SeatStatsResponse(
-                        seat.getId(),
-                        seat.getSection(),
-                        seat.getTotalCount(),
-                        seat.getReservedCount(),
-                        seat.getAvailableCount(),
-                        seat.getPrice()
-                ))
-                .toList();
-    }
 }

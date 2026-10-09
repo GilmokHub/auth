@@ -8,7 +8,6 @@ import AdminReservations from './pages/admin/AdminReservations.jsx'
 import AdminSeatManagement from './pages/admin/AdminSeatManagement.jsx'
 import EventList from './pages/user/EventList'
 import UserEventDetail from './pages/user/UserEventDetail'
-import QueueWaiting from './pages/user/QueueWaiting'
 import SeatSelection from './pages/user/SeatSelection'
 import ReservationConfirm from './pages/user/ReservationConfirm'
 import ReservationResult from './pages/user/ReservationResult'
@@ -25,7 +24,6 @@ export default function App() {
       <Route element={<UserLayout />}>
         <Route path="/" element={<EventList />} />
         <Route path="/events/:eventId" element={<UserEventDetail />} />
-        <Route path="/events/:eventId/queue" element={<QueueWaiting />} />
         <Route path="/events/:eventId/seats" element={<SeatSelection />} />
         <Route path="/events/:eventId/reserve/confirm" element={<ReservationConfirm />} />
         <Route path="/reservations/:code" element={<ReservationResult />} />
