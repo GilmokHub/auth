@@ -7,14 +7,17 @@ export default function SeatSelection() {
   const { eventId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const queueKey = location.state?.queueKey || localStorage.getItem(`queueKey_${eventId}`)
-  const admissionToken = location.state?.token || localStorage.getItem(`admissionToken_${eventId}`)
+  const queueKey = location.state?.queueKey || sessionStorage.getItem(`queueKey_${eventId}`)
+  const admissionToken = location.state?.token || sessionStorage.getItem(`admissionToken_${eventId}`)
 
   useEffect(() => {
     if (location.state?.token) {
-      localStorage.setItem(`admissionToken_${eventId}`, location.state.token)
+      sessionStorage.setItem(`admissionToken_${eventId}`, location.state.token)
     }
-  }, [eventId, location.state?.token])
+    if (location.state?.queueKey) {
+      sessionStorage.setItem(`queueKey_${eventId}`, location.state.queueKey)
+    }
+  }, [eventId, location.state?.token, location.state?.queueKey])
 
   const [seats, setSeats] = useState([])
   const [selectedSeat, setSelectedSeat] = useState(null)
@@ -47,7 +50,7 @@ export default function SeatSelection() {
     })
       .then((d) => {
         navigate(`/events/${eventId}/reserve/confirm`, {
-          state: { reservation: d },
+          state: { reservation: d, token: admissionToken },
         })
       })
       .catch((err) => setError(err.message || '예약 요청 중 오류가 발생했습니다.'))

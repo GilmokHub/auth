@@ -9,6 +9,12 @@ export default function ReservationConfirm() {
   const navigate = useNavigate()
   const location = useLocation()
   const reservation = location.state?.reservation
+  const admissionToken = location.state?.token || sessionStorage.getItem(`admissionToken_${eventId}`)
+
+  const cleanupSessionToken = () => {
+    sessionStorage.removeItem(`admissionToken_${eventId}`)
+    sessionStorage.removeItem(`queueKey_${eventId}`)
+  }
 
   const calcRemaining = () => {
     const holdSeconds = reservation?.holdSeconds || DEFAULT_HOLD_SECONDS
@@ -52,26 +58,38 @@ export default function ReservationConfirm() {
     setConfirming(true)
     setError(null)
 
-    api.post(`/reservations/${reservation.reservationCode}/confirm`)
+    const headers = {
+      'X-Admission-Token': admissionToken ? `Bearer ${admissionToken}` : '',
+    }
+
+    api.post(`/reservations/${reservation.reservationCode}/confirm`, undefined, { headers })
       .then((d) => {
+        cleanupSessionToken()
         navigate(`/reservations/${reservation.reservationCode}`, {
           state: { reservation: d },
         })
       })
       .catch((err) => {
-        if (err.status === 403) {
-          setError('입장 권한이 없거나 만료되었습니다. 대기열을 다시 거쳐주세요.');
+        if (err.status === 403 || err.status === 401) {
+          setError('입장 권한이 없거나 만료되었습니다. 대기열을 다시 거쳐주세요.')
         } else {
-          setError(err.message || '확정 요청 중 오류가 발생했습니다.');
+          setError(err.message || '확정 요청 중 오류가 발생했습니다.')
         }
       })
       .finally(() => setConfirming(false))
   }
 
   const handleCancel = () => {
-    api.delete(`/reservations/${reservation.reservationCode}`)
-      .then(() => navigate(`/events/${eventId}/seats`))
-      .catch(() => setError('취소 실패'))
+    const headers = {
+      'X-Admission-Token': admissionToken ? `Bearer ${admissionToken}` : '',
+    }
+
+    api.delete(`/reservations/${reservation.reservationCode}`, { headers })
+      .then(() => {
+        cleanupSessionToken()
+        navigate(`/events/${eventId}/seats`)
+      })
+      .catch((err) => setError(err.message || '취소 실패'))
   }
 
   const minutes = Math.floor(remaining / 60)
